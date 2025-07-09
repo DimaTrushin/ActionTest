@@ -276,4 +276,4 @@ TSWLatexianTemp*
 *.lpz
 
 # Ignore compiled files
-*.pdf
+# *.pdf
