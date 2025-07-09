@@ -1,0 +1,41 @@
+name: Build and upload LaTeX document
+
+on:
+  push:
+    branches: 
+    - master
+
+jobs:
+  build_upload_latex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v4
+
+      - name: Check if main.tex exists
+        id: main_check
+        uses: andstor/file-existence-action@v3
+        with:
+          files: "main.tex"
+          
+      - name: Compile LaTeX document
+        if: steps.main_check.outputs.files_exists == 'true'
+        id: build
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          
+      - name: Push pdf into the repo
+        if: steps.build.outcome == 'success'
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: Add compiled pdf
+          commit_options: '--no-verify --signoff'
+          commit_author: Author <actions@github.com>
+          branch: master
+          status_options: '--untracked-files=no'
+          skip_dirty_check: true
+          file_pattern: 'main.pdf'
